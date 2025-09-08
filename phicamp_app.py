@@ -372,6 +372,29 @@ async def download_csv(request: Request):
 async def root():
     return {"message": "PhiCamp Email Dashboard API", "status": "running"}
 
+# ==== Track Email via Redirect (for MikroTik dst) ====
+@app.get("/track")
+async def track(email: str = None):
+    if email:
+        try:
+            conn = get_connection()
+            cur = conn.cursor()
+            cur.execute(
+                """
+                INSERT INTO phicamp_emails (email, is_verified)
+                VALUES (%s, TRUE)
+                ON CONFLICT (email) DO UPDATE SET is_verified = TRUE
+                """,
+                (email,),
+            )
+            conn.commit()
+            cur.close()
+            conn.close()
+        except Exception:
+            # Best-effort: on any error, continue redirecting to destination
+            pass
+    return RedirectResponse(url=DST_URL)
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
