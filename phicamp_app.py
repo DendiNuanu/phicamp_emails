@@ -8,6 +8,10 @@ import psycopg2
 import os
 import csv
 from io import StringIO
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = FastAPI()
 
@@ -29,7 +33,7 @@ DB_CONFIG = {
     "port": os.getenv("DB_PORT"),
     "dbname": os.getenv("DB_NAME"),
     "user": os.getenv("DB_USER"),
-    "password": os.getenv("DB_PASSWORD"),
+    "password": os.getenv("DB_PASSWORD", "your-password-here"),
     "sslmode": os.getenv("DB_SSLMODE", "require")
 }
 
